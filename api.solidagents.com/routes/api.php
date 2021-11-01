@@ -1,11 +1,13 @@
 <?php
 
 use App\Classes\PropertyDataClass;
+use App\Http\Controllers\Api\CallRequestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\PropertiesController;
+use App\Http\Controllers\Api\PropertyRequestController;
 use App\Http\Controllers\api\SearchController;
 
 /*
@@ -26,6 +28,10 @@ Route::middleware('auth:api')->get('/users', function (Request $request) {
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register', [RegisterController::class, 'signup']);
 Route::middleware('auth:api')->get('login', "Api\LoginController@index");
+Route::middleware('auth:api')->group(function () {
+    Route::post('request_call', [CallRequestController::class, 'request_call']);
+    Route::post('property_request', [PropertyRequestController::class, 'request_property']);
+});
 Route::get('/properties/{type?}/{id?}', [PropertiesController::class, 'index']);
 Route::get('search', [SearchController::class, 'search']);
 Route::get('states', function () {
