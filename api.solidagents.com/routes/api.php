@@ -1,10 +1,13 @@
 <?php
 
+use App\Classes\PropertyDataClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\PropertiesController;
+use App\Http\Controllers\api\SearchController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,9 +23,14 @@ Route::middleware('auth:api')->get('/users', function (Request $request) {
     //return ['Name' => 'Donzoby'];
     return $request->user()->id;
 });
-Route::post('login', [LoginController::class,'login']);
-Route::post('register', [RegisterController::class,'signup']);
+Route::post('login', [LoginController::class, 'login']);
+Route::post('register', [RegisterController::class, 'signup']);
 Route::middleware('auth:api')->get('login', "Api\LoginController@index");
-Route::get('/properties/{type?}/{id?}',[PropertiesController::class, 'index']);
+Route::get('/properties/{type?}/{id?}', [PropertiesController::class, 'index']);
+Route::get('search', [SearchController::class, 'search']);
+Route::get('states', function () {
+    $data_class = new PropertyDataClass;
+    return $data_class->get_states();
+});
 Route::middleware('auth:api')->post('/properties', [PropertiesController::class, 'store']);
 Route::middleware('auth:api')->delete('/properties/{id}', [PropertiesController::class, 'delete']);
