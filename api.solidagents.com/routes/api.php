@@ -28,9 +28,12 @@ Route::middleware('auth:api')->get('/users', function (Request $request) {
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register', [RegisterController::class, 'signup']);
 Route::middleware('auth:api')->get('login', "Api\LoginController@index");
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     Route::post('request_call', [CallRequestController::class, 'request_call']);
-    Route::post('property_request', [PropertyRequestController::class, 'request_property']);
+    Route::post('request_property', [PropertyRequestController::class, 'request_property']);
+    Route::get('requests', function (Request $request) {
+        return ['msg' => $request->user()->id . ' Getting user\'s requests'];
+    });
 });
 Route::get('/properties/{type?}/{id?}', [PropertiesController::class, 'index']);
 Route::get('search', [SearchController::class, 'search']);
