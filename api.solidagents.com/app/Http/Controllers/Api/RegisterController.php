@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Classes\{UploadClass};
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    public function signup(Request $request){
+    public function signup(Request $request)
+    {
         $this->validate($request, [
             'first_name'    => 'required|string|min:2|max:25',
             'last_name'     => 'required|string|min:2|max:25',
@@ -23,12 +26,23 @@ class RegisterController extends Controller
         $user->tel          = $request->tel;
         $user->email        = $request->email;
         $user->password     = Hash::make($request->password);
-        if($user->save()){
-            if($request->file('dp')){
-                $uploadClass = new UploadClass('images/profile_images/',$user->id);
+        if ($user->save()) {
+            if ($request->file('dp')) {
+                $uploadClass = new UploadClass('images/profile_images/', $user->id);
                 $uploadClass->upload($request->file('dp'));
             }
-            return ['response' => "Account Created successfully"];
+            $login = $request->validate([
+                'email' => 'required|email|string',
+                'password' => 'required|string'
+            ]);
+            if (Auth::attempt($login)) {
+                Auth::user()->dp_link = URL(Auth::user()->dp_link); //formate the link for json
+                $user = Auth::user();
+                $accessToken = Auth::user()->createToken('authToken')->accessToken;
+                return ['status' => 1, 'response' => "Account Created successfully", 'user' => $user, 'access_token' => $accessToken];
+            } else {
+                return ['status' => 2, 'response' => "Account Created successfully but could not sign in"];
+            }
         }
     }
 }

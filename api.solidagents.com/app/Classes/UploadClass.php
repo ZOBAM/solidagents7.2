@@ -28,7 +28,7 @@ class UploadClass {
     }
     public function upload($file){
         $this->target_file = $file;
-        $imageName = $this->property->id.'_'.time().'_solidagents_'.$this->target_file->getClientOriginalName();
+        $imageName = ($this->user_id ? $this->user_id : $this->property->id) . '_'.time().'_solidagents_'.$this->target_file->getClientOriginalName();
         $img_link = $this->save_dir.$imageName;
         //move file
         if($this->target_file->move(self::$base_path.$this->save_dir, $imageName)){
@@ -66,4 +66,3 @@ class UploadClass {
         }
     }
 }
-?>

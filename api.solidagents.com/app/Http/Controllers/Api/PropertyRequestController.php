@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Property_request;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PropertyRequestController extends Controller
 {
@@ -43,5 +44,30 @@ class PropertyRequestController extends Controller
         $property_request->description = $request->houseType ? 'house_type:' . $request->houseType : 'purpose:' . $request->purpose . ',plots:' . $request->plots;
         $property_request->save();
         return ['status' => 1, 'message' => 'Your request has been submitted. You will soon get a deal.'];
+    }
+    public function process_desc($request_obj)
+    {
+        $desc_arr = explode(',', $request_obj->description);
+        foreach ($desc_arr as $desc) {
+            $new_desc_arr = explode(':', $desc);
+            //Log::info($new_desc_arr[0] . ' and ' . $new_desc_arr[1]);
+            $my_name = $new_desc_arr[0];
+            $request_obj->$my_name  = $new_desc_arr[1];
+            //Log::info($request_obj);
+        }
+        return $request_obj;
+    }
+    public function get_requests($id = false)
+    {
+        if ($id) {
+            return $this->process_desc(Property_request::find($id));
+            //return Property_request::find($id);
+        }
+        $property_requests = Property_request::get();
+        foreach ($property_requests as $request) {
+            $request = $this->process_desc($request);
+        }
+        //Log::info($property_requests);
+        return $property_requests;
     }
 }

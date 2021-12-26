@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Classes\{UploadClass};
-use App\Models\{Property, House_detail, Land_detail, Property_image};
+use App\Models\{Property, House_detail, Land_detail, Like, Property_image};
+use Illuminate\Support\Facades\Log;
 
 class PropertiesController extends Controller
 {
     public function append_resources($property_obj, $type = "images")
     {
         if ($type == "images" && $property_obj->image_count > 0) {
+            //Log::info($property_obj->property_image);
             return $property_obj->property_image;
         }
         if ($type == "details") {
@@ -21,7 +23,7 @@ class PropertiesController extends Controller
             return true;
         }
     }
-    public function index(Request $request, $type = false, $id = false)
+    public function index(Request $request, $type = false, $id = false, $user_id = false)
     {
         $get_specific_prop = false;
         //Property::where('price', '>', 0)->searchable();
@@ -35,6 +37,15 @@ class PropertiesController extends Controller
                     //update likes
                     $properties->views++;
                     $properties->save();
+                    //get liked if user_id is set
+                    if ($user_id) {
+                        $liked = Like::where('property_id', $id)->where('user_id', $user_id)->first();
+                        if ($liked) {
+                            $properties->liked = true;
+                        } else {
+                            $properties->liked = false;
+                        }
+                    }
                 } else //properties/land
                     $properties = Property::where('type', $type)->orderBy('created_at', 'DESC')->get();
             }

@@ -2,6 +2,7 @@
 
 use App\Classes\PropertyDataClass;
 use App\Http\Controllers\Api\CallRequestController;
+use App\Http\Controllers\Api\LikesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\PropertiesController;
 use App\Http\Controllers\Api\PropertyRequestController;
 use App\Http\Controllers\api\SearchController;
+use App\Http\Controllers\Api\VerifyController;
 use App\Models\Property_request;
 
 /*
@@ -33,14 +35,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('request_call', [CallRequestController::class, 'request_call']);
     Route::post('request_property', [PropertyRequestController::class, 'request_property']);
 });
-Route::get('requests', function () {
-    return Property_request::get();
-});
-Route::get('/properties/{type?}/{id?}', [PropertiesController::class, 'index']);
+Route::get('requests/{id?}', [PropertyRequestController::class, 'get_requests']);
+Route::get('/properties/{type?}/{id?}/{user_id?}', [PropertiesController::class, 'index']);
 Route::get('search', [SearchController::class, 'search']);
 Route::get('states', function () {
     $data_class = new PropertyDataClass;
     return $data_class->get_states();
 });
+Route::middleware('auth:api')->post('verify', [VerifyController::class, 'verify']);
 Route::middleware('auth:api')->post('/properties', [PropertiesController::class, 'store']);
+Route::middleware('auth:api')->post('/like', [LikesController::class, 'like']);
 Route::middleware('auth:api')->delete('/properties/{id}', [PropertiesController::class, 'delete']);
