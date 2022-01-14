@@ -16,9 +16,10 @@ class VerifyEmail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public $verification_code;
+    public function __construct($code)
     {
-        //
+        $this->verification_code = $code;
     }
 
     /**
@@ -28,6 +29,6 @@ class VerifyEmail extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->view('emails.send_verification_code');
     }
 }

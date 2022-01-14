@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Classes\{UploadClass};
+use App\Classes\{UploadClass, UserClass};
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,6 +39,9 @@ class RegisterController extends Controller
                 Auth::user()->dp_link = URL(Auth::user()->dp_link); //formate the link for json
                 $user = Auth::user();
                 $accessToken = Auth::user()->createToken('authToken')->accessToken;
+                //send verification code to email
+                $user_class = new UserClass($user->id);
+                $user_class->send_verification_code();
                 return ['status' => 1, 'response' => "Account Created successfully", 'user' => $user, 'access_token' => $accessToken];
             } else {
                 return ['status' => 2, 'response' => "Account Created successfully but could not sign in"];

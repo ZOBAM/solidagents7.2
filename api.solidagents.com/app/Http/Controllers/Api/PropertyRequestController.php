@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Classes\PropertyClass;
 use App\Http\Controllers\Controller;
 use App\Models\Property_request;
 use Carbon\Carbon;
@@ -45,18 +46,7 @@ class PropertyRequestController extends Controller
         $property_request->save();
         return ['status' => 1, 'message' => 'Your request has been submitted. You will soon get a deal.'];
     }
-    public function process_desc($request_obj)
-    {
-        $desc_arr = explode(',', $request_obj->description);
-        foreach ($desc_arr as $desc) {
-            $new_desc_arr = explode(':', $desc);
-            //Log::info($new_desc_arr[0] . ' and ' . $new_desc_arr[1]);
-            $my_name = $new_desc_arr[0];
-            $request_obj->$my_name  = $new_desc_arr[1];
-            //Log::info($request_obj);
-        }
-        return $request_obj;
-    }
+
     public function get_requests($id = false)
     {
         if ($id) {
@@ -64,8 +54,9 @@ class PropertyRequestController extends Controller
             //return Property_request::find($id);
         }
         $property_requests = Property_request::get();
+        $property_class = new PropertyClass;
         foreach ($property_requests as $request) {
-            $request = $this->process_desc($request);
+            $request = $property_class->process_desc($request);
         }
         //Log::info($property_requests);
         return $property_requests;

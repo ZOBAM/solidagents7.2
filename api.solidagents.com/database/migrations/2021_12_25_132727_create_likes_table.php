@@ -13,13 +13,15 @@ class CreateLikesTable extends Migration
      */
     public function up()
     {
-        Schema::create('likes', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('user_id');
-            $table->bigInteger('property_id');
-            $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('likes')) { //this was the fix for an error when I was told that the table likes already exist during migration
+            Schema::create('likes', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('user_id');
+                $table->bigInteger('property_id');
+                $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

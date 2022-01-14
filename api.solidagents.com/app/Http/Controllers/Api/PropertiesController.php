@@ -62,6 +62,8 @@ class PropertiesController extends Controller
                 if ($properties) {
                     //if($properties->image_count>0)
                     $properties->property_image = $this->append_resources($properties);
+                    $properties->owner = $properties->user;
+                    $properties->owner->dp_link = URL($properties->owner->dp_link);
                     $this->append_resources($properties, 'details');
                 }
             }

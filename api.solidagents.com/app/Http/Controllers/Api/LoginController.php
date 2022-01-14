@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Classes\PropertyClass;
 use App\Classes\UserClass;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -26,7 +27,12 @@ class LoginController extends Controller
         $user = Auth::user();
         $user_class = new UserClass($user->id);
         $user->call_requests = $user_class->get_request('call');
-        $user->property_requests = $user_class->get_request();
+        $property_requests = $user_class->get_request();
+        $property_class = new PropertyClass;
+        foreach ($property_requests as $request) {
+            $request = $property_class->process_desc($request);
+        }
+        $user->property_requests = $property_requests;
         return response([
             'user' => $user, 'access_token' => $accessToken
         ]);

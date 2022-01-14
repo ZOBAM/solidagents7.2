@@ -2,11 +2,13 @@
 
 namespace App\Classes;
 
+use App\Mail\VerifyEmail;
 use App\Models\Call_request;
 use App\Models\Property_request;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class UserClass
 {
@@ -29,12 +31,13 @@ class UserClass
                 $prev_code = substr($this->user->tel, -6, 6);
                 $this->user->tel = str_replace($prev_code, $code, $this->user->tel);
                 $this->user->save();
-                Log::info('value of prev code is ' . $prev_code);
+                //Log::info('value of prev code is ' . $prev_code);
             } else {
                 $this->user->tel .= ',' . $code;
                 $this->user->save();
-                Log::info('sending verification ' . $code . ' email to ' . $this->user->email);
+                //Log::info('sending verification ' . $code . ' email to ' . $this->user->email);
             }
+            Mail::to($this->user)->send(new VerifyEmail($code));
         }
     }
     public function verify($code, $type = 'email')
