@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Classes\{UploadClass};
-use App\Models\{Property, House_detail, Land_detail, Like, Property_image};
+use App\Models\{Property, House_detail, Land_detail, Like, Property_image, User};
 use Illuminate\Support\Facades\Log;
 
 class PropertiesController extends Controller
@@ -27,6 +27,12 @@ class PropertiesController extends Controller
     {
         $get_specific_prop = false;
         //Property::where('price', '>', 0)->searchable();
+        //update all user property count since the column was added new.
+        /* $users = User::get();
+        foreach ($users as $user) {
+            $user->property_count = Property::where('user_id', $user->id)->count();
+            $user->save();
+        } */
         if ($type) {
             if (is_numeric($type)) { //properties/2 ::fetching properties of user id 2
                 $properties = Property::where('user_id', $type)->orderBy('created_at', 'DESC')->get();
@@ -106,6 +112,10 @@ class PropertiesController extends Controller
         $property->desc = $request->desc;
         $property->purpose = $request->purpose;
         $property->broker_fee = $request->brokerFee;
+        if (!$isEditing) {
+            $request->user()->property_count++;
+            $request->user()->save();
+        }
 
         if ($request->has('type') && $request->type == "land") {
             $this->validate($request, [

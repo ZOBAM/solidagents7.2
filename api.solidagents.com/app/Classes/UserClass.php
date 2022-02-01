@@ -37,7 +37,7 @@ class UserClass
                 $this->user->save();
                 //Log::info('sending verification ' . $code . ' email to ' . $this->user->email);
             }
-            Mail::to($this->user)->send(new VerifyEmail($code));
+            //Mail::to($this->user)->send(new VerifyEmail($code));
         }
     }
     public function verify($code, $type = 'email')
